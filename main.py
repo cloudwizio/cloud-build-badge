@@ -55,7 +55,10 @@ def build_badge(event, context):
 
         src = 'badges/{}.svg'.format(data['status'].lower())
         dest = Template(tmpl).substitute(repo=repo, branch=branch)
+        copy_badge(bucket, src, dest)
 
+        # for non master branches
+        dest = Template(tmpl).substitute(repo=repo, branch='badge')
         copy_badge(bucket, src, dest)
 
         return
