@@ -10,9 +10,12 @@ steps:
           gsutil -m -h "Cache-Control:no-cache,max-age=0" cp ./badges/*.svg gs://$PROJECT_ID-badges/badges/
         fi
         gcloud functions deploy cloud-build-badge                                   \
-        --no-gen2                                                                   \
+        --gen2                                                                      \
         --runtime python311                                                         \
         --entry-point build_badge                                                   \
         --trigger-topic=cloud-builds                                                \
+        --region $LOCATION                                                          \
+        --vpc-connector projects/$PROJECT_ID/locations/$LOCATION/connectors/main   \
+        --egress-settings all-traffic                                               \
         --update-labels commitid=$COMMIT_SHA                                        \
         --set-env-vars BADGES_BUCKET=$PROJECT_ID-badges,TEMPLATE_PATH='builds/${repo}/${branch}.svg'
