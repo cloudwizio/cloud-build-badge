@@ -1,4 +1,9 @@
 steps:
+  # Delete existing Cloud Function if it exists
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args: ["-c", "gcloud functions delete cloud-build-badge --region=${LOCATION} --quiet || true"]
+
   - name: gcr.io/cloud-builders/gcloud
     entrypoint: bash
     args:
@@ -11,11 +16,14 @@ steps:
         fi
         gcloud functions deploy cloud-build-badge                                   \
         --gen2                                                                      \
-        --runtime python311                                                         \
+        --runtime python312                                                         \
         --entry-point build_badge                                                   \
         --trigger-topic=cloud-builds                                                \
         --region $LOCATION                                                          \
-        --vpc-connector projects/$PROJECT_ID/locations/$LOCATION/connectors/main   \
-        --egress-settings all-traffic                                               \
+        --vpc-connector projects/$PROJECT_ID/locations/$LOCATION/connectors/main    \
+        --ingress-settings internal-only                                            \
+        --egress-settings all                                                       \
+        --no-allow-unauthenticated                                                  \
+        --service-account $PROJECT_ID@appspot.gserviceaccount.com                  \
         --update-labels commitid=$COMMIT_SHA                                        \
         --set-env-vars BADGES_BUCKET=$PROJECT_ID-badges,TEMPLATE_PATH='builds/${repo}/${branch}.svg'
