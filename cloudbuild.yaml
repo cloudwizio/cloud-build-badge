@@ -24,6 +24,6 @@ steps:
         --ingress-settings internal-only                                            \
         --egress-settings all                                                       \
         --no-allow-unauthenticated                                                  \
-        --service-account $PROJECT_ID@appspot.gserviceaccount.com                  \
+        --service-account $PROJECT_ID@appspot.gserviceaccount.com                   \
         --update-labels commitid=$COMMIT_SHA                                        \
         --set-env-vars BADGES_BUCKET=$PROJECT_ID-badges,TEMPLATE_PATH='builds/${repo}/${branch}.svg'
